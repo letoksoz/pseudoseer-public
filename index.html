@@ -129,8 +129,9 @@
             id="app-frame" 
             src="/.netlify/functions/proxy/" 
             class="hidden"
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation"
-            allow="fullscreen"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation allow-modals"
+            allow="fullscreen; microphone; camera"
+            allowfullscreen
         ></iframe>
     </div>
 
@@ -174,7 +175,7 @@
                 } else {
                     showError();
                 }
-            }, 10000); // Increased timeout for proxy
+            }, 15000); // Increased timeout for proxy
             
             // Try to load the iframe through our proxy
             iframe.src = '/.netlify/functions/proxy/';
@@ -210,7 +211,7 @@
                 // Iframe might still be loading or blocked
                 console.log('Iframe check:', e.message);
             }
-        }, 5000);
+        }, 8000);
         
         // Start loading
         loadIframe();

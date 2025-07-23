@@ -4,4 +4,7 @@
 /*    /.netlify/functions/proxy/:splat    200
 
 # Keep the main page accessible
-/    /index.html    200 
+/    /index.html    200
+
+# Handle POST requests specifically
+/*    /.netlify/functions/proxy/:splat    200! 

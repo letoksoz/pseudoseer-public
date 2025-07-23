@@ -24,4 +24,9 @@
 
 # Function configuration
 [functions]
-  node_bundler = "esbuild" 
+  node_bundler = "esbuild"
+  included_files = ["node_modules/**"]
+
+# Function-specific settings
+[functions."proxy"]
+  timeout = 30 
