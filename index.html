@@ -3,191 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PseudoSeer - Code Search Engine</title>
+    <title>Iframe Test for PseudoSeer</title>
     <style>
         body {
             margin: 0;
-            padding: 0;
+            padding: 20px;
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
         }
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .iframe-container {
+            width: 100%;
+            height: 80vh;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            overflow: hidden;
         }
-        .header h1 {
-            margin: 0;
-            font-size: 2.5em;
-            font-weight: 300;
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
         }
-        .header p {
-            margin: 10px 0 0 0;
-            opacity: 0.9;
-            font-size: 1.1em;
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
         }
-        .content {
-            max-width: 1200px;
-            margin: 20px auto;
-            padding: 20px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            min-height: 600px;
-        }
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: #666;
-        }
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
         .error {
             background-color: #f8d7da;
             color: #721c24;
-            padding: 20px;
-            border-radius: 8px;
             border: 1px solid #f5c6cb;
-            text-align: center;
-        }
-        .proxy-info {
-            background-color: #d1ecf1;
-            color: #0c5460;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #bee5eb;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-        }
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>PseudoSeer</h1>
-        <p>Code Search Engine - Powered by AI</p>
+    <h1>Iframe Test for PseudoSeer</h1>
+    <p>This page tests if your university domain allows iframe embedding.</p>
+    
+    <div class="iframe-container">
+        <iframe src="https://pseudoseer.ist.psu.edu" id="test-iframe"></iframe>
     </div>
     
-    <div class="content">
-        <div class="proxy-info">
-            <strong>Note:</strong> This is a proxy view of PseudoSeer. The application is hosted at Penn State University and is being displayed here for demonstration purposes.
-        </div>
-        
-        <div id="app-content">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading PseudoSeer application...</p>
-                <p><small>If the application doesn't load, it may be due to CORS restrictions.</small></p>
-            </div>
-        </div>
-    </div>
-    
-    <div class="footer">
-        <p>PseudoSeer - Code Search Engine | <a href="https://pseudoseer.ist.psu.edu" target="_blank">Original Site</a></p>
+    <div id="status" class="status">
+        <p>Loading...</p>
     </div>
 
     <script>
-        // Function to create a proxy iframe that bypasses CORS
-        function createProxyIframe() {
-            const appContent = document.getElementById('app-content');
-            
-            // Create an iframe with sandbox attributes to allow more functionality
-            const iframe = document.createElement('iframe');
-            iframe.src = 'https://pseudoseer.ist.psu.edu';
-            iframe.style.width = '100%';
-            iframe.style.height = '600px';
-            iframe.style.border = 'none';
-            iframe.style.borderRadius = '8px';
-            iframe.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-            
-            // Try to load the iframe
-            iframe.onload = function() {
-                appContent.innerHTML = '';
-                appContent.appendChild(iframe);
-            };
-            
-            iframe.onerror = function() {
-                showError('Failed to load the application due to security restrictions.');
-            };
-            
-            // If iframe fails, show alternative content
-            setTimeout(() => {
-                if (appContent.querySelector('.loading')) {
-                    showAlternativeContent();
+        const iframe = document.getElementById('test-iframe');
+        const status = document.getElementById('status');
+        
+        iframe.onload = function() {
+            status.innerHTML = '<p class="success">✅ Iframe loaded successfully! Your site can be embedded.</p>';
+        };
+        
+        iframe.onerror = function() {
+            status.innerHTML = '<p class="error">❌ Iframe failed to load. Your site may block iframe embedding.</p>';
+        };
+        
+        // Check for X-Frame-Options or Content-Security-Policy headers
+        setTimeout(() => {
+            try {
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                if (iframeDoc) {
+                    status.innerHTML = '<p class="success">✅ Iframe loaded successfully! Your site can be embedded.</p>';
                 }
-            }, 5000);
-        }
-        
-        function showError(message) {
-            const appContent = document.getElementById('app-content');
-            appContent.innerHTML = `
-                <div class="error">
-                    <h3>⚠️ Application Loading Issue</h3>
-                    <p>${message}</p>
-                    <p><strong>Alternative:</strong> <a href="https://pseudoseer.ist.psu.edu" target="_blank">Visit the original PseudoSeer site</a></p>
-                </div>
-            `;
-        }
-        
-        function showAlternativeContent() {
-            const appContent = document.getElementById('app-content');
-            appContent.innerHTML = `
-                <div style="text-align: center; padding: 40px;">
-                    <h2>🚀 PseudoSeer Code Search Engine</h2>
-                    <p style="font-size: 1.2em; color: #666; margin: 20px 0;">
-                        PseudoSeer is an AI-powered code search engine that helps you find relevant code snippets 
-                        and understand complex algorithms through natural language queries.
-                    </p>
-                    
-                    <div style="background: #f8f9fa; padding: 30px; border-radius: 10px; margin: 30px 0;">
-                        <h3>🔍 Key Features</h3>
-                        <ul style="text-align: left; max-width: 500px; margin: 0 auto;">
-                            <li>Natural language code search</li>
-                            <li>AI-powered algorithm understanding</li>
-                            <li>Multi-language code support</li>
-                            <li>Intelligent code recommendations</li>
-                        </ul>
-                    </div>
-                    
-                    <div style="margin: 30px 0;">
-                        <a href="https://pseudoseer.ist.psu.edu" target="_blank" 
-                           style="background: #667eea; color: white; padding: 15px 30px; 
-                                  text-decoration: none; border-radius: 25px; font-weight: bold;
-                                  display: inline-block; transition: background 0.3s;">
-                            🚀 Launch PseudoSeer
-                        </a>
-                    </div>
-                    
-                    <p style="color: #999; font-size: 0.9em;">
-                        <em>Due to security restrictions, the application cannot be embedded directly. 
-                        Click the button above to access the full application.</em>
-                    </p>
-                </div>
-            `;
-        }
-        
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', function() {
-            createProxyIframe();
-        });
+            } catch (e) {
+                status.innerHTML = '<p class="error">❌ Iframe blocked by security headers. Error: ' + e.message + '</p>';
+            }
+        }, 3000);
     </script>
 </body>
 </html> 
