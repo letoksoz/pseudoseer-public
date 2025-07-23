@@ -1,0 +1,6 @@
+# Netlify redirects file
+# Redirect all routes to index.html for SPA-like behavior
+/*    /index.html   200
+
+# Optional: Add specific redirects if needed
+# /old-page    /new-page    301 
