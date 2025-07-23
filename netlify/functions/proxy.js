@@ -1,6 +1,13 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event, context) => {
+  console.log('Proxy request:', {
+    method: event.httpMethod,
+    path: event.path,
+    queryParams: event.queryStringParameters,
+    headers: event.headers
+  });
+
   // Handle OPTIONS requests for CORS
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -26,6 +33,8 @@ exports.handler = async (event, context) => {
         .join('&') : '';
     
     const fullTargetUrl = targetUrl + queryString;
+    
+    console.log('Target URL:', fullTargetUrl);
 
     // Prepare headers
     const headers = {
@@ -35,6 +44,7 @@ exports.handler = async (event, context) => {
       'Accept-Encoding': 'gzip, deflate, br',
       'Connection': 'keep-alive',
       'Upgrade-Insecure-Requests': '1',
+      'Referer': 'https://pseudoseer.ist.psu.edu/',
     };
 
     // Handle POST requests (like search forms)
@@ -44,6 +54,7 @@ exports.handler = async (event, context) => {
     };
 
     if (event.httpMethod === 'POST') {
+      console.log('POST request body:', event.body);
       fetchOptions.body = event.body;
       if (event.headers['content-type']) {
         headers['Content-Type'] = event.headers['content-type'];
@@ -52,16 +63,26 @@ exports.handler = async (event, context) => {
 
     // Fetch the content from PSU server
     const response = await fetch(fullTargetUrl, fetchOptions);
+    
+    console.log('Response status:', response.status);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
     if (!response.ok) {
+      console.error('Response not ok:', response.status, response.statusText);
       return {
         statusCode: response.status,
-        body: `Error: ${response.statusText}`
+        headers: {
+          'Content-Type': 'text/plain',
+          'Access-Control-Allow-Origin': '*',
+        },
+        body: `Error: ${response.status} ${response.statusText} - URL: ${fullTargetUrl}`
       };
     }
 
     // Get the content type
     const contentType = response.headers.get('content-type') || 'text/html';
+    
+    console.log('Content type:', contentType);
     
     // Handle different content types
     if (contentType.includes('text/html')) {
@@ -80,12 +101,7 @@ exports.handler = async (event, context) => {
         'src="/.netlify/functions/proxy/$1"'
       );
       
-      modifiedContent = modifiedContent.replace(
-        /action=["']\/([^"']*)["']/g, 
-        'action="/.netlify/functions/proxy/$1"'
-      );
-      
-      // Handle form action URLs
+      // Handle form action URLs more carefully
       modifiedContent = modifiedContent.replace(
         /action=["']([^"']*)["']/g, 
         (match, url) => {
@@ -93,6 +109,8 @@ exports.handler = async (event, context) => {
             return match; // Keep absolute URLs as is
           } else if (url.startsWith('/')) {
             return `action="/.netlify/functions/proxy${url}"`;
+          } else if (url === '') {
+            return `action="/.netlify/functions/proxy${path}"`;
           } else {
             return `action="/.netlify/functions/proxy/${url}"`;
           }
@@ -201,7 +219,15 @@ exports.handler = async (event, context) => {
     console.error('Proxy error:', error);
     return {
       statusCode: 500,
-      body: 'Internal Server Error: ' + error.message
+      headers: {
+        'Content-Type': 'text/plain',
+        'Access-Control-Allow-Origin': '*',
+      },
+      body: 'Internal Server Error: ' + error.message + '\n\nRequest details:\n' + JSON.stringify({
+        method: event.httpMethod,
+        path: event.path,
+        queryParams: event.queryStringParameters
+      }, null, 2)
     };
   }
 }; 
