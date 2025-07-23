@@ -23,7 +23,13 @@ exports.handler = async (event, context) => {
 
   try {
     // Get the path from the request
-    const path = event.path.replace('/.netlify/functions/proxy', '');
+    let path = event.path.replace('/.netlify/functions/proxy', '');
+    
+    // Handle the case where the path might be duplicated
+    if (path.includes('/.netlify/functions/proxy')) {
+      path = path.replace('/.netlify/functions/proxy', '');
+    }
+    
     const targetUrl = `https://pseudoseer.ist.psu.edu${path}`;
     
     // Get query parameters
@@ -101,12 +107,19 @@ exports.handler = async (event, context) => {
         'src="/.netlify/functions/proxy/$1"'
       );
       
-      // Handle form action URLs more carefully
+      // Handle form action URLs more carefully - don't rewrite search endpoints
       modifiedContent = modifiedContent.replace(
         /action=["']([^"']*)["']/g, 
         (match, url) => {
           if (url.startsWith('http')) {
             return match; // Keep absolute URLs as is
+          } else if (url.startsWith('/search_es') || url.startsWith('search_es')) {
+            // Keep search endpoints as they are, just add proxy prefix
+            if (url.startsWith('/')) {
+              return `action="/.netlify/functions/proxy${url}"`;
+            } else {
+              return `action="/.netlify/functions/proxy/${url}"`;
+            }
           } else if (url.startsWith('/')) {
             return `action="/.netlify/functions/proxy${url}"`;
           } else if (url === '') {
