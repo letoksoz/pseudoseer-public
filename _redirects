@@ -1,6 +1,7 @@
 # Netlify redirects file
-# Redirect all routes to index.html for SPA-like behavior
-/*    /index.html   200
 
-# Optional: Add specific redirects if needed
-# /old-page    /new-page    301 
+# Proxy all requests to the PSU server through our function
+/*    /.netlify/functions/proxy/:splat    200
+
+# Keep the main page accessible
+/    /index.html    200 

@@ -1,6 +1,7 @@
 [build]
   # No build command needed for static HTML
   publish = "."
+  functions = "netlify/functions"
 
 [build.environment]
   # Set any environment variables if needed
@@ -10,7 +11,7 @@
   # Security headers
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
+    X-Frame-Options = "SAMEORIGIN"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
@@ -19,4 +20,8 @@
   # Handle 404s gracefully
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
+
+# Function configuration
+[functions]
+  node_bundler = "esbuild" 

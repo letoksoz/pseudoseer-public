@@ -1,0 +1,19 @@
+{
+  "name": "pseudoseer-proxy",
+  "version": "1.0.0",
+  "description": "PseudoSeer proxy for Netlify deployment",
+  "main": "index.html",
+  "scripts": {
+    "build": "echo 'No build step required'",
+    "dev": "netlify dev"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "@netlify/functions": "^2.0.0"
+  },
+  "keywords": ["pseudoseer", "proxy", "netlify"],
+  "author": "PseudoSeer Team",
+  "license": "MIT"
+} 

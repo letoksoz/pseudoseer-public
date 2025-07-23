@@ -1,58 +1,109 @@
-# PseudoSeer Redirect
+# PseudoSeer Proxy
 
-This is a redirect page for the PseudoSeer application hosted at Penn State University. Due to university security restrictions that prevent iframe embedding, this page serves as a clean redirect to the main application.
+This is a proxy solution for the PseudoSeer application that allows users to access the Penn State University-hosted application while staying on your Netlify domain. This approach avoids showing the `pseudoseer.ist.psu.edu` URL in the address bar.
+
+## How It Works
+
+The solution uses a combination of:
+1. **Netlify Functions**: A serverless function that proxies requests to the PSU server
+2. **Iframe Integration**: Displays the proxied content in an iframe
+3. **URL Rewriting**: Modifies relative URLs in the content to work with the proxy
 
 ## Features
 
-- **Automatic Redirect**: Automatically redirects to the main PseudoSeer application after 5 seconds
-- **Manual Redirect**: Users can click the button to redirect immediately
-- **Modern Design**: Clean, responsive design with gradient backgrounds
-- **Information Display**: Provides context about the application and why the redirect is necessary
+- **Domain Masking**: Users stay on your Netlify domain
+- **Full Functionality**: All PSU application features work through the proxy
+- **Error Handling**: Graceful fallback if the proxy fails
+- **Loading States**: Professional loading indicators
+- **Retry Logic**: Automatic retry on connection failures
+
+## Project Structure
+
+```
+├── index.html              # Main page with iframe
+├── netlify/
+│   └── functions/
+│       └── proxy.js        # Serverless proxy function
+├── _redirects              # Netlify redirect rules
+├── netlify.toml           # Netlify configuration
+├── package.json           # Dependencies
+└── README.md              # This file
+```
 
 ## Deployment
 
-This project is configured for deployment on Netlify with the following files:
+### Prerequisites
+- Netlify account
+- Git repository (GitHub, GitLab, or Bitbucket)
 
-- `index.html` - Main redirect page
-- `_redirects` - Netlify redirect rules
-- `netlify.toml` - Netlify configuration
-- `README.md` - This documentation
+### Steps
 
-## How to Deploy
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
 
-1. **Connect to Netlify**:
-   - Push your code to a Git repository (GitHub, GitLab, or Bitbucket)
+2. **Deploy to Netlify**:
+   - Push your code to a Git repository
    - Connect your repository to Netlify
-   - Netlify will automatically detect the static site and deploy it
+   - Netlify will automatically detect the configuration and deploy
 
-2. **Manual Deployment**:
-   - Drag and drop the project folder to Netlify's deploy area
-   - The site will be deployed automatically
-
-3. **Custom Domain** (Optional):
-   - In your Netlify dashboard, go to Domain settings
-   - Add your custom domain
-   - Configure DNS settings as instructed
+3. **Manual Deployment**:
+   - Install Netlify CLI: `npm install -g netlify-cli`
+   - Run: `netlify deploy --prod`
 
 ## Configuration Files
 
+### `netlify/functions/proxy.js`
+- Proxies requests to `https://pseudoseer.ist.psu.edu`
+- Modifies HTML content to fix relative URLs
+- Removes problematic security headers
+- Handles errors gracefully
+
 ### `_redirects`
-Handles URL routing and ensures all paths serve the main page.
+- Routes all requests through the proxy function
+- Keeps the main page accessible
 
 ### `netlify.toml`
-Configures build settings, security headers, and redirect rules.
+- Configures build settings and functions
+- Sets security headers
+- Defines function bundling
 
-## Security
+## How the Proxy Works
 
-The site includes security headers to protect against common web vulnerabilities:
-- X-Frame-Options: DENY
-- X-XSS-Protection: 1; mode=block
-- X-Content-Type-Options: nosniff
-- Referrer-Policy: strict-origin-when-cross-origin
+1. User visits your Netlify domain
+2. The iframe loads content from `/.netlify/functions/proxy/`
+3. The proxy function fetches content from `https://pseudoseer.ist.psu.edu`
+4. URLs in the content are rewritten to work with the proxy
+5. The modified content is served back to the iframe
+6. User sees the PSU application but stays on your domain
 
-## Target URL
+## Troubleshooting
 
-The redirect points to: `https://pseudoseer.ist.psu.edu`
+### Common Issues
+
+1. **Function Timeout**: Netlify functions have a 10-second timeout limit
+2. **CORS Issues**: The proxy handles CORS automatically
+3. **URL Rewriting**: Relative URLs are automatically fixed
+
+### Debugging
+
+- Check Netlify function logs in the dashboard
+- Use browser developer tools to inspect iframe loading
+- Test the proxy function directly: `yourdomain.netlify.app/.netlify/functions/proxy/`
+
+## Security Considerations
+
+- The proxy respects the original server's security policies
+- No sensitive data is stored or cached
+- All requests are logged for monitoring
+- HTTPS is enforced for all connections
+
+## Performance
+
+- Content is cached for 5 minutes to improve performance
+- Static assets are served directly when possible
+- The proxy adds minimal latency
 
 ## License
 
