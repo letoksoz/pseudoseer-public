@@ -30,6 +30,11 @@ exports.handler = async (event, context) => {
       path = path.replace('/.netlify/functions/proxy', '');
     }
     
+    // Redirect root path to index2
+    if (path === '' || path === '/') {
+      path = '/index2';
+    }
+    
     const targetUrl = `https://pseudoseer.ist.psu.edu${path}`;
     
     // Get query parameters
